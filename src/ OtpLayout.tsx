@@ -30,7 +30,7 @@ export const OtpLayout = (props: any) => {
   // useEffect to focus first input box
   useEffect(() => {
     data.input0.current.focus();
-  }, [data.count]);
+  }, []);  
  
   // function to handle the first input from the box
   const handleInputOtp1 = (e: any) => {
@@ -77,7 +77,6 @@ export const OtpLayout = (props: any) => {
       data.input2.current.value = "";
     }
   };
-
   // function to handle the fourth input from the box
   const handleInputOtp4 = (e: any) => {
     // validation
