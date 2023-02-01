@@ -4,10 +4,9 @@ export const OtpLayout = (props: any) => {
   const data = useContext(UserContext);
   const time = useContext(UserContext)
   const [enteredOtp, setEnteredOtp] = useState<any>([]);
-  // const [timer, setTimer] = useState<number>(60);
   const [flag, setFlag] = useState<boolean>(false);
   const [buttonStatus, setButtonStatus] = useState<boolean>(true);
-  // const [display, setDisplay] = useState<string>("");
+  const [display, setDisplay] = useState<string>("");
 
   // useEffect Hook used to start the timer and show success notification
   useEffect(() => {
@@ -106,7 +105,7 @@ export const OtpLayout = (props: any) => {
           data.input4.current.blur();
           // to hide the modal from the UI after given time
           setTimeout(() => {
-            // setDisplay("none");
+            setDisplay("none");
             window.location.reload();
           }, 1000);
         } else {
@@ -130,7 +129,7 @@ export const OtpLayout = (props: any) => {
         tabIndex={-1}
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
-        // style={{ display: display }}
+        style={{ display: display }}
       >
         <div className="modal-dialog">
           <div className="modal-content">

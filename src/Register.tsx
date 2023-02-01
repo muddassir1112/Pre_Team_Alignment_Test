@@ -38,7 +38,6 @@ export const Register = () => {
     setSentSuccess("One time passcode sent successfully");
     setFailureMsg("");
     setOtp(temp as any);
-    // input0.current.focus();
     input0.current.value = "";
     input1.current.value = "";
     input2.current.value = "";
