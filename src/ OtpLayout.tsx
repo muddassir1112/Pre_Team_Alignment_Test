@@ -1,120 +1,129 @@
-import React, { useContext, useRef, useState } from "react";
-import { UserContext } from "./App";
-
-export const OtpLayout = () => {
+import React, { useContext, useEffect, useState } from "react";
+import { UserContext } from "./Register";
+export const OtpLayout = (props: any) => {
   const data = useContext(UserContext);
-  const [otp, setOtp] = useState<any>([]);
+  const time = useContext(UserContext)
   const [enteredOtp, setEnteredOtp] = useState<any>([]);
-  const [count, setCount] = useState<number>(5);
-  const [greenBorder, setGreenBorder] = useState("");
-  const [redBorder, setRedBorder] = useState("");
-  const input0: any = useRef();
-  const input1: any = useRef();
-  const input2: any = useRef();
-  const input3: any = useRef();
-  const input4: any = useRef();
-  const sent: any = useRef();
-  const generateOtp = (e: React.SyntheticEvent) => {
-    let number: any;
-    let temp;
-    if (count > 1) {
-      setCount((prev) => prev - 1);
-      number = JSON.stringify(Math.ceil(Math.random() * 100000));
-      temp = number.split("");
-      for (let i = 0; i < temp.length; i++) {
-        if (temp.length < 5) {
-          temp.push(Math.ceil(Math.random() * 10));
+  // const [timer, setTimer] = useState<number>(60);
+  const [flag, setFlag] = useState<boolean>(false);
+  const [buttonStatus, setButtonStatus] = useState<boolean>(true);
+  // const [display, setDisplay] = useState<string>("");
+
+  // useEffect Hook used to start the timer and show success notification
+  useEffect(() => {
+    // for timer
+    if (time.timer >= 0) {
+      setTimeout(() => {
+        time.setTimer((prev:number) => prev - 1);
+      }, 1000);
+    } else time.setTimer(0);
+    if (data.timer === 0) {
+      time.setTimer(0);
+      setButtonStatus(false);
+    }
+    // condition to hide the success notification
+    setTimeout(() => {
+      data.setSentSuccess("");
+    }, 3000);
+  }, [time.timer]);
+
+  // useEffect to focus first input box
+  useEffect(() => {
+    data.input0.current.focus();
+  }, [data.count]);
+ 
+  // function to handle the first input from the box
+  const handleInputOtp1 = (e: any) => {
+    // validations
+    if (e.target.value === "") {
+      data.input0.current.focus();
+    } else if (e.target.value >= 0 && e.target.value <= 9) {
+      data.input1.current.focus();
+      enteredOtp.push(e.target.value);
+      setEnteredOtp([...enteredOtp]);
+    } else {
+      alert("Please enter number between[0-9]");
+      data.input0.current.value = "";
+    }
+  };
+
+  // function to handle the second input from the box
+  const handleInputOtp2 = (e: any) => {
+    // validations
+    if (e.target.value === "") {
+      data.input0.current.focus();
+      console.log("Blank");
+    } else if (e.target.value >= 0 && e.target.value <= 9) {
+      data.input2.current.focus();
+      enteredOtp.push(e.target.value);
+      setEnteredOtp([...enteredOtp]);
+    } else {
+      alert("Please enter number between[0-9]");
+      data.input1.current.value = "";
+    }
+  };
+
+  // function to handle the third input from the box
+  const handleInputOtp3 = (e: any) => {
+    // validations
+    if (e.target.value === "") {
+      data.input1.current.focus();
+    } else if (e.target.value >= 0 && e.target.value <= 9) {
+      data.input3.current.focus();
+      enteredOtp.push(e.target.value);
+      setEnteredOtp([...enteredOtp]);
+    } else {
+      alert("Please enter number between[0-9]");
+      data.input2.current.value = "";
+    }
+  };
+
+  // function to handle the fourth input from the box
+  const handleInputOtp4 = (e: any) => {
+    // validation
+    if (e.target.value === "") {
+      data.input2.current.focus();
+    } else if (e.target.value >= 0 && e.target.value <= 9) {
+      data.input4.current.focus();
+      enteredOtp.push(e.target.value);
+      setEnteredOtp([...enteredOtp]);
+    } else {
+      alert("Please enter number between[0-9]");
+      data.input3.current.value = "";
+    }
+  };
+
+  // function to handle the fifth input from the box
+  const handleInputOtp5 = (e: any) => {
+    // validation
+    if (e.target.value === "") {
+      data.input3.current.focus();
+    } else if (e.target.value >= 0 && e.target.value <= 9) {
+      enteredOtp.push(e.target.value);
+      setEnteredOtp([...enteredOtp]);
+      for (let i = 0; i < data.otp.length; i++) {
+        if (data.otp[i] === enteredOtp[i]) {
+          data.setGreenBorder("green-border");
+          data.input4.current.blur();
+          // to hide the modal from the UI after given time
+          setTimeout(() => {
+            // setDisplay("none");
+            window.location.reload();
+          }, 1000);
+        } else {
+          setFlag(true);
+          data.setRedBorder("red-border");
+          data.setFailureMsg("Entered One time passcode is incorrect");
+          data.input4.current.blur();
         }
       }
-    } else{
-      setCount(0);
-      // setOtp(["You have reached your limit"])
-    }
-    setGreenBorder("");
-    // input0.current.focus();
-    input0.current.value = "";
-    input1.current.value = "";
-    input2.current.value = "";
-    input3.current.value = "";
-    input4.current.value = "";
-    setOtp(temp as any);
-    // console.log(otp.length);
-    console.log(otp);
-  };
-  const handleInputOtp1 = (e: any) => {
-    console.log(e.target.value);
-    if (e.target.value >= 0 && e.target.value <= 9) {
-      input1.current.focus();
-      enteredOtp.push(e.target.value);
-      setEnteredOtp([...enteredOtp]);
     } else {
       alert("Please enter number between[0-9]");
-      input0.current.value = "";
-    }
-  };
-  const handleInputOtp2 = (e: any) => {
-    console.log(e.target.value);
-    if (e.target.value >= 0 && e.target.value <= 9) {
-      console.log("Yes");
-      input2.current.focus();
-      enteredOtp.push(e.target.value);
-      setEnteredOtp([...enteredOtp]);
-    } else {
-      alert("Please enter number between[0-9]");
-      input1.current.value = "";
-    }
-  };
-  const handleInputOtp3 = (e: any) => {
-    console.log(e.target.value);
-    if (e.target.value >= 0 && e.target.value <= 9) {
-      console.log("Yes");
-      input3.current.focus();
-      enteredOtp.push(e.target.value);
-      setEnteredOtp([...enteredOtp]);
-    } else {
-      alert("Please enter number between[0-9]");
-      input2.current.value = "";
-    }
-  };
-  const handleInputOtp4 = (e: any) => {
-    console.log(e.target.value);
-    if (e.target.value >= 0 && e.target.value <= 9) {
-      console.log("Yes");
-      input4.current.focus();
-      enteredOtp.push(e.target.value);
-    } else {
-      alert("Please enter number between[0-9]");
-      input3.current.value = "";
-    }
-  };
-  const handleInputOtp5 = (e: any) => {
-    console.log(e.target.value);
-    if (e.target.value >= 0 && e.target.value <= 9) {
-      enteredOtp.push(e.target.value);
-      setEnteredOtp([...enteredOtp]);
-      for (let i = 0; i < otp.length; i++) {
-        if (otp[i] === enteredOtp[i]) {
-          setGreenBorder("green-border");
-          
-        } else setRedBorder("red-border");
-      }
-    } else {
-      alert("Please enter number between[0-9]");
-      input4.current.value = "";
+      data.input4.current.value = "";
     }
   };
   return (
-    // Button trigger modal
     <>
-      <button
-        type="button"
-        className="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#exampleModal"
-        onClick={generateOtp}
-      >
-        Validate OTP
-      </button>
       {/* Modal */}
       <div
         className="modal fade"
@@ -122,12 +131,13 @@ export const OtpLayout = () => {
         tabIndex={-1}
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
+        // style={{ display: display }}
       >
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel">
-                Verify Email Address({otp})
+                Verify Email Address({data.otp})
               </h5>
               {/* Close Button */}
               <button
@@ -142,55 +152,65 @@ export const OtpLayout = () => {
               <p className="card-text">Enter your code here:</p>
               {/* input boxes */}
               <input
-                ref={input0}
-                className={`input-box ${greenBorder} ${redBorder}`}
-                type="number"
-                // value={Input1}
+                ref={data.input0}
+                className={`input-box ${data.greenBorder} ${data.redBorder}`}
+                type="text"
+                maxLength={1}
                 onChange={handleInputOtp1}
               />
               <input
-                ref={input1}
-                className={`input-box ${greenBorder} ${redBorder}`}
-                type="number"
-                // value={Input2}
+                ref={data.input1}
+                className={`input-box ${data.greenBorder} ${data.redBorder}`}
+                type="text"
+                maxLength={1}
                 onChange={handleInputOtp2}
               />
               <input
-                ref={input2}
-                className={`input-box ${greenBorder} ${redBorder}`}
-                type="number"
-                // value={Input3}
+                ref={data.input2}
+                className={`input-box ${data.greenBorder} ${data.redBorder}`}
+                type="text"
+                maxLength={1}
                 onChange={handleInputOtp3}
               />
               <input
-                ref={input3}
-                className={`input-box ${greenBorder} ${redBorder}`}
-                type="number"
-                // value={Input4}
+                ref={data.input3}
+                className={`input-box ${data.greenBorder} ${data.redBorder}`}
+                type="text"
+                maxLength={1}
                 onChange={handleInputOtp4}
               />
               <input
-                ref={input4}
-                className={`input-box ${greenBorder} ${redBorder}`}
-                type="number"
-                // value={Input5}
+                ref={data.input4}
+                className={`input-box ${data.greenBorder} ${data.redBorder}`}
+                type="text"
+                maxLength={1}
                 onChange={handleInputOtp5}
               />
             </div>
             {/* Modal Footer */}
-            {/* <div className="modal-footer"> */}
             <div className="card-header">
-              <p style={{ color: "red" }} id="wrong">
-                Enter One-time passcode is incorrect
-              </p>
-              <p style={{ color: "green" }} ref={sent}>
-                One-time passcode sent successfully!!!
-              </p>
-              <a href="#0" style={{ textAlign: "left" }} onClick={generateOtp}>
+              {/* Notification section */}
+              <p style={{ color: "green" }}>{data.SentSuccess}</p>
+              {/* conditional rendering to show if the password does not match */}
+              {flag ? <p style={{ color: "red" }}>{data.failureMsg}</p> : null}
+              {/* resend passcode button */}
+              <button
+                className="btn-light resend"
+                style={{ border: "none" }}
+                onClick={props.generateOtp}
+                disabled={buttonStatus}
+              >
                 Resend one-time-passcode
-              </a>
-              ({count} attempts left)
+              </button>
+              &nbsp;&nbsp;&nbsp;
+              {/* remaining attemps left section */}
+              <span className="text-muted">({data.count} attempts left)</span>
+              {/* timer */}
+              <span className="float-end" style={{ color: "red" }}>
+                00:{time.timer}
+              </span>
             </div>
+            {/* Modal Footer Closed */}
           </div>
         </div>
       </div>
