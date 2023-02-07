@@ -12,6 +12,7 @@ export const Register1 = () => {
     inputDigitRef.current.focus();
   }, []);
   const generateOTPhandler = (e: React.SyntheticEvent) => {
+      // data.setCounter(0)
     // e.preventDefault();
     if (data.inputDigit === "" || regexInput.test(data.inputDigit) === false) {
       inputDigitRef.current.value = "";

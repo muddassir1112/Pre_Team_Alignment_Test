@@ -33,7 +33,7 @@ export const OtpLayout1 = (props: any) => {
       setButtonStatus(false);
       timer.setCounter(0);
     }
-  }, [data.otp,timer]);
+  }, [timer.counter]);
   // function to handle entered otp
   const handleInputOtp = (item: any, index: number) => {
     if (refs[index].current.value !== "") {
