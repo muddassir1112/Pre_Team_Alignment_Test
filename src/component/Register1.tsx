@@ -12,27 +12,32 @@ export const Register1 = () => {
     inputDigitRef.current.focus();
   }, []);
   const generateOTPhandler = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    if (data.inputDigit === "") {
+    // e.preventDefault();
+    if (data.inputDigit === "" || regexInput.test(data.inputDigit) === false) {
+      inputDigitRef.current.value = "";
       alert("Please Enter Number of Digit");
     } else if (regexInput.test(data.inputDigit) === true) {
-      //   alert("Yes");
-      if (data.inputDigit === "4") {
-        generateOTP(9000, 1000);
-        console.log(random);
-      } else if (data.inputDigit === "5") {
-        generateOTP(99999, 10000);
-        console.log(random);
-      } else if (data.inputDigit === "6") {
-        generateOTP(999999, 100000);
-        console.log(random);
-      } else if (data.inputDigit === "7") {
-        generateOTP(9999999, 1000000);
-        console.log(random);
+      data.setCount((prev: any) => prev - 1);
+      data.setCounter(15);
+      if (data.count > 0) {
+        if (data.inputDigit === "4") {
+          generateOTP(9000, 1000);
+        } else if (data.inputDigit === "5") {
+          generateOTP(99999, 10000);
+        } else if (data.inputDigit === "6") {
+          generateOTP(999999, 100000);
+        } else if (data.inputDigit === "7") {
+          generateOTP(9999999, 1000000);
+        }
+      } else {
+        data.setOtp(["You have eceeded your limit"]);
+        data.setCount(0);
+        return;
       }
     } else {
-        inputDigitRef.current.value = ""
-        alert("Please Enter Number Between [4-7]")};
+      inputDigitRef.current.value = "";
+      alert("Please Enter Number Between [4-7]");
+    }
   };
   const generateOTP = (max: number, min: number) => {
     random = Math.floor(Math.random() * max + min)
@@ -47,7 +52,6 @@ export const Register1 = () => {
         <h2 className="mt-2 mb-5" style={{ textAlign: "center" }}>
           Pre-Team Alignment Test
         </h2>
-        {/* <form onSubmit={generateOTPhandler}> */}
         <label htmlFor="digits">
           Enter Number of Digits of OTP :
           <input
@@ -70,10 +74,9 @@ export const Register1 = () => {
         >
           Validate OTP
         </button>
-        {/* </form> */}
         {/* component render */}
         {Number(data.inputDigit) >= 4 && Number(data.inputDigit) <= 7 ? (
-          <OtpLayout1 />
+          <OtpLayout1 generateOTPhandler={generateOTPhandler} />
         ) : null}
       </div>
     </>
