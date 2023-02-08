@@ -1,51 +1,44 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { createContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { UserContext } from "../App";
-import { OtpLayout1 } from "./OtpLayout1";
+import { OtpLayout } from "./OtpLayout";
 
-export const Register1 = () => {
-  const data = useContext(UserContext);
+export const Register = () => {
+  const data = useContext(UserContext); //useContext Hook
   const inputDigitRef = React.useRef<HTMLInputElement>(null!);
-  const regexInput = /^[4-7\b]+$/;
+  const regexInput = /^[4-7\b]+$/; //regex expression for user input digit
+  //temporary variable to store the random number
   let random: string[];
+  // useEffect Hook to focus on input box
   useEffect(() => {
     inputDigitRef.current.focus();
   }, []);
+  // function to check to generate the random number as per user input
   const generateOTPhandler = (e: React.SyntheticEvent) => {
-      // data.setCounter(0)
-    // e.preventDefault();
-    if (data.inputDigit === "" || regexInput.test(data.inputDigit) === false) {
-      inputDigitRef.current.value = "";
-      alert("Please Enter Number of Digit");
-    } else if (regexInput.test(data.inputDigit) === true) {
-      data.setCount((prev: any) => prev - 1);
-      data.setCounter(15);
-      if (data.count > 0) {
-        if (data.inputDigit === "4") {
-          generateOTP(9000, 1000);
-        } else if (data.inputDigit === "5") {
-          generateOTP(99999, 10000);
-        } else if (data.inputDigit === "6") {
-          generateOTP(999999, 100000);
-        } else if (data.inputDigit === "7") {
-          generateOTP(9999999, 1000000);
-        }
-      } else {
-        data.setOtp(["You have eceeded your limit"]);
-        data.setCount(0);
-        return;
-      }
-    } else {
-      inputDigitRef.current.value = "";
-      alert("Please Enter Number Between [4-7]");
-    }
+    if (data.inputDigit === "4") {
+      generateOTP(9000, 1000);
+    } else if (data.inputDigit === "5") {
+      generateOTP(99999, 10000);
+    } else if (data.inputDigit === "6") {
+      generateOTP(999999, 100000);
+    } else if (data.inputDigit === "7") {
+      generateOTP(9999999, 1000000);
+    } else return;
   };
+  // function to generate the random number
   const generateOTP = (max: number, min: number) => {
     random = Math.floor(Math.random() * max + min)
       .toString()
       .split("");
     data.setOtp(random);
     return random;
+  };
+  // validation for taking valid user input
+  const checkDigit = () => {
+    if (data.inputDigit === "" || !regexInput.test(data.inputDigit)) {
+      alert("Please Enter Number Between [4-7]");
+      inputDigitRef.current.value = "";
+      inputDigitRef.current.focus();
+    } else return;
   };
   return (
     <>
@@ -71,13 +64,13 @@ export const Register1 = () => {
           className="btn btn-primary mb-3"
           data-bs-toggle="modal"
           data-bs-target="#exampleModal"
-          onClick={generateOTPhandler}
+          onClick={checkDigit}
         >
           Validate OTP
         </button>
         {/* component render */}
         {Number(data.inputDigit) >= 4 && Number(data.inputDigit) <= 7 ? (
-          <OtpLayout1 generateOTPhandler={generateOTPhandler} />
+          <OtpLayout generateOTPhandler={generateOTPhandler} />
         ) : null}
       </div>
     </>

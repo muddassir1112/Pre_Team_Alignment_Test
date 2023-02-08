@@ -1,15 +1,10 @@
 import React, { createContext, useState } from "react";
 import "./App.css";
-import { Register1 } from "./component/Register1";
-// import { Register } from './Register';
+import { Register } from "./component/Register";
 export const UserContext = createContext<any>({});
 function App() {
-  const [inputDigit, setInputDigit] = useState<string>("");
-  const [otp, setOtp] = useState<string[]>([]);
-  const [counter, setCounter] = useState(15);
-  const [count, setCount] = useState<any>(5);
-  const [greenBorder, setGreenBorder] = useState<string>(""); //state to set green border
-  const [redBorder, setRedBorder] = useState<string>(""); //state to set red border
+  const [inputDigit, setInputDigit] = useState<string>("");//user input digit
+  const [otp, setOtp] = useState<string[]>([]); //array state to store the generated otp
   return (
     <UserContext.Provider
       value={{
@@ -17,18 +12,9 @@ function App() {
         setOtp,
         inputDigit,
         setInputDigit,
-        count,
-        setCount,
-        counter,
-        setCounter,
-        greenBorder,
-        setGreenBorder,
-        redBorder,
-        setRedBorder,
       }}
     >
-      {/* <Register/> */}
-      <Register1 />
+      <Register />
     </UserContext.Provider>
   );
 }

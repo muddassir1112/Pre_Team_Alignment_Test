@@ -7,48 +7,64 @@ import React, {
 } from "react";
 import { UserContext } from "../App";
 
-export const OtpLayout1 = (props: any) => {
+export const OtpLayout = (props: any) => {
+  // contexts
   const data = useContext(UserContext);
-  const timer = useContext(UserContext);
+  // array state to print input boxes
   const [refs, setRefs] = useState<any>([]);
+  // array state to hold the inputs
   const [otpArray, setOtpArray] = useState<string[]>([]);
+  // state to disable the button
   const [buttonStatus, setButtonStatus] = useState<boolean>(true);
-
+  // state to set notification
+  const [Notification, setNotification] = useState<string>("");
+   // state for timer
+   const [counter, setCounter] = useState(60);
+   // state for attempts
+   const [attempts, setAttempts] = useState<any>(4);
+   //state for success msg
+   const [sentOtpAgain, setSentOtpAgain] = useState("");
+   // loader state
+   const [loader, setLoader] = useState("none");
+  // ref to open the modal with focus on first input
   const divref: any = useRef();
+  // regex expression for input values
   const regexInput = /^[0-9\b]+$/;
-  console.log("attempts:", data.count);
+ 
+  // useEffect Hook
   useEffect(() => {
-    for (let i = 0; i < data.inputDigit; i++) {
-      refs.push(React.createRef());
+    // function call to generate the otp
+    props.generateOTPhandler();
+    // to print the input boxes as per user input
+    for (let i = 0; i < Number(data.inputDigit); i++) {
+      refs.push(createRef());
+      otpArray.push(" ");
     }
+    setOtpArray([...otpArray]);
     setRefs([...refs]);
     divref.current.addEventListener("shown.bs.modal", function () {
       refs[0].current.focus();
     });
   }, [data.inputDigit]);
+  // useEffect Hook for timer
   useEffect(() => {
-    if (timer.counter > 0) {
-      setTimeout(() => timer.setCounter(timer.counter - 1), 1000);
+    if (counter > 0) {
+      setTimeout(() => setCounter(counter - 1), 1000);
     } else {
       setButtonStatus(false);
-      timer.setCounter(0);
+      setCounter(0);
     }
-  }, [timer.counter]);
+  }, [counter]);
   // function to handle entered otp
   const handleInputOtp = (item: any, index: number) => {
-    if (refs[index].current.value !== "") {
-      if (index < data.otp.length - 1) {
+    if (regexInput.test(refs[index].current.value)) {
+      if (refs[index].current.value !== "") {
         otpArray.splice(index, 1, refs[index].current.value);
         setOtpArray([...otpArray]);
         checkOtp();
         refs[index].current.nextSibling.focus();
-      } else {
-        checkOtp();
-        refs[index].current.focus();
       }
-    } else if (item.current.value === "") {
-      item.current.value = "";
-    }
+    } else refs[index].current.value = "";
   };
   // function to handle delete input
   const handleDeleteOtp = (item: any, e: any, index: number) => {
@@ -56,28 +72,53 @@ export const OtpLayout1 = (props: any) => {
       (e.key === "Backspace" || e.key === "Delete") &&
       item.current.value === ""
     ) {
-      otpArray.splice(index, 1, item.current.value);
+      otpArray.splice(index, 1, " ");
       setOtpArray([...otpArray]);
       item.current.previousSibling.focus();
+      setNotification("");
     }
+    checkOtp();
   };
   // function to send resend otp
   const resendOTP = () => {
-    // e.preventDefault();
-    if (data.count > 0) {
+    if (attempts > 0) {
+      setAttempts((prev: any) => prev - 1);
+      for (let i = 0; i < refs.length; i++) {
+        refs[i].current.value = "";
+        otpArray[i] = " ";
+      }
+      setOtpArray([...otpArray]);
+      setCounter(60);
       setButtonStatus(true);
+      setSentOtpAgain("One time passcode sent successfully");
+      setNotification("");
+      refs[0].current.focus();
       props.generateOTPhandler();
-      // setCounter(15);
     } else {
+      setNotification("");
+      setSentOtpAgain("You have reached your limit");
       setButtonStatus(true);
-      // setCounter(0);
+      setAttempts(0);
     }
   };
   // function to check the otp
   const checkOtp = () => {
     if (JSON.stringify(data.otp) === JSON.stringify(otpArray)) {
-      alert("MAtch");
-    } else alert("Not Match");
+      setNotification("Otp Matched");
+      setSentOtpAgain("");
+      setLoader("block");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } else if (
+      JSON.stringify(data.otp) !== JSON.stringify(otpArray) &&
+      JSON.stringify(otpArray).includes(" ") === false
+    ) {
+      setSentOtpAgain("");
+      setNotification("Entered one time passcode is incorrect");
+    } else {
+      setNotification("");
+    }
   };
   return (
     <>
@@ -113,21 +154,37 @@ export const OtpLayout1 = (props: any) => {
                 <input
                   key={index}
                   ref={ele}
-                  // className = "current"
-                  className={`input-box ${data.greenBorder} ${data.redBorder}`}
-                  // className="input-box"
+                  className={`input-box ${
+                    Notification === "Entered one time passcode is incorrect"
+                      ? "red-border"
+                      : Notification === ""
+                      ? ""
+                      : "green-border"
+                  }`}
                   type="text"
                   maxLength={1}
                   onKeyDown={(e: any) => handleDeleteOtp(ele, e, index)}
                   onChange={() => handleInputOtp(ele, index)}
                 />
               ))}
+              {/* Loader */}
+              <span className="float-end" style={{ display: loader }}>
+                <div
+                  className="spinner-border ms-auto"
+                  role="status"
+                  aria-hidden="true"
+                ></div>
+              </span>
             </div>
             {/* Modal Footer */}
             <div className="card-header">
               {/* Notification section */}
-              {/* <p style={{ color: "green" }}>{data.SentSuccess}</p> */}
-              {/* conditional rendering to show if the password does not match */}
+              {sentOtpAgain !== "" ? (
+                <p style={{ color: "green" }}>{sentOtpAgain}</p>
+              ) : null}
+              {Notification === "Entered one time passcode is incorrect" ? (
+                <p style={{ color: "red" }}>{Notification}</p>
+              ) : null}
               {/* resend passcode button */}
               <button
                 className="btn-light resend"
@@ -139,16 +196,12 @@ export const OtpLayout1 = (props: any) => {
               </button>
               &nbsp;&nbsp;&nbsp;
               {/* remaining attemps left section */}
-              <span className="text-muted">({data.count} attempts left)</span>
+              <span className="text-muted">({attempts} attempts left)</span>
               {/* timer */}
               <span className="float-end" style={{ color: "red" }}>
                 <p>
                   00:
-                  {timer.counter < 10 ? (
-                    `0${timer.counter}`
-                  ) : (
-                    <>{timer.counter}</>
-                  )}
+                  {counter < 10 ? `0${counter}` : <>{counter}</>}
                 </p>
               </span>
             </div>
